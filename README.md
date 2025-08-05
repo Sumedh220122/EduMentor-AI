@@ -23,5 +23,5 @@
    python main.py
    ```
 
-You can get your Cohere API key at: https://cohere.com/<br>
-You can get your TAVILY API KEY at: https://www.tavily.com/
+You can get your Cohere API key for free at: https://cohere.com/<br>
+You can get your TAVILY API KEY for free at: https://www.tavily.com/
