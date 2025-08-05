@@ -5,20 +5,20 @@
 
 **Steps to run this file**
 
-1. Create a virtual environment
+1. Create a virtual environment<br>
    ```
    python -m venv .venv
    ```
-2. Install requirements
+2. Install requirements</br>
     ```
     pip install -r requirements.txt
     ```
-3. Create a .env file in the root and set up the following env variables
+3. Create a .env file in the root and set up the following env variables</br>
    ```
    COHERE_API_KEY=
    TAVILY_API_KEY=
    ```
-4. Run the main file:
+4. Run the main file:</br>
    ```
    python main.py
    ```
