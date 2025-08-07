@@ -12,8 +12,9 @@ class StudentDetails(BaseModel):
     goal: str = Field(..., description="What is the goal of the student at the end of the day?")
 
 class Roadmap(BaseModel):
+    week: str
     topic: str
-    roadmap: str
+    sub_topic: str
     url_resources : list[str]
 
 class StudentRoadMaps(BaseModel):

@@ -1,4 +1,6 @@
 langchain-community
-langchain-cohere
+langchain-cohere>=0.1.0,<0.2.0
 python-dotenv
 langgraph
+bs4
+json_repair

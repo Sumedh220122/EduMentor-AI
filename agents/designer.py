@@ -53,7 +53,7 @@ class Designer:
         state["messages"] = state["messages"] + [response_msg]
 
     
-    def design_roadmap(self, state: AgentState):
+    def design_roadmap(self, state: AgentState) -> dict:
         """
         Craft a personalized roadmap for the given student
         """
@@ -66,17 +66,21 @@ class Designer:
 
         for detail in topicwise_details:
             sub_topics = detail["sub_topics"]
-            sub_topics_str = ",".join(sub_topics)
+            subtopic_metadata = []
+            for sub_topic in sub_topics:
+                search_query = f"Online resources on medium.com for {sub_topic}"
+                resources = self.search_web(search_query, max_results = 2)
+                resource_urls = [resource["url"] for resource in resources]
 
-            search_query = f"Online resources for {sub_topics_str}"
-            
-            resources = self.search_web(search_query, max_results = 6)
-
+                subtopic_metadata.append({
+                    "sub_topic": sub_topic,
+                    "online_resources": resource_urls
+                })
+                
             topic_resources.append(
                 {
                     "topic" : detail["topic"],
-                    "sub_topics" : sub_topics,
-                    "online_resources" : [resource["url"] for resource in resources]
+                    "subtopic_metadata": subtopic_metadata
                 }
             )
 
@@ -139,10 +143,3 @@ class Designer:
         print(f"Found {len(results)} from the web for the given search query: {search_query}")
 
         return results
-        
-
-
-        
-
-        
-
