@@ -7,7 +7,7 @@
 2. Creating personalized roadmaps based on individual learning pace and capabilities
 
 **Tech Stack Used**
-This is a python project. EduMentor is a *Multi-Agentic* assistant that has been built with the help of Langgraph and Langchain
+:This is a python project. EduMentor is a *Multi-Agentic* assistant that has been built with the help of Langgraph and Langchain
 frameworks in python. *Cohere* is used as the llm across all agents. *Tavily* is used for searching resources on web and *Rapid-API* is used for scraping resources fetched from the web.
 
 **Steps to run this file**
