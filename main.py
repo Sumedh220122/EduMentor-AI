@@ -24,14 +24,19 @@ class EduMentor:
 
       return graph_builder
     
-    def create_lessons(self, student_info: dict):
+    def create_lessons(self, student_info: dict) -> list[str]:
       graph_builder = self.init_graph()
       graph = graph_builder.compile()
 
+      lessons_list = []
+
       output = graph.invoke({"messages": [{"role" : "user", "content" : json.dumps(student_info)}]})
 
+
       for i in range(-1, -4, -1):
-        print(f"Message {i}: {len(output['messages'][i].content)}")
+        lessons_list.append(output['messages'][i].content)
+
+      return lessons_list
 
 if __name__ == "__main__":
     student_info ={

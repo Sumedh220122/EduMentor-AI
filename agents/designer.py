@@ -1,7 +1,10 @@
 import json
+import httpx
 import json_repair
 from langchain_cohere import ChatCohere
 from dotenv import load_dotenv
+from bs4 import BeautifulSoup
+from urllib.parse import urlparse, parse_qs, unquote
 from models import AgentState, StudentDetails, StudentRoadMaps
 from langchain_core.output_parsers import PydanticOutputParser
 from langchain_core.prompts import ChatPromptTemplate, PromptTemplate
@@ -15,6 +18,7 @@ load_dotenv()
 class Designer:
     def __init__(self):
         self.llm = ChatCohere()
+        self.user_agent = "Puch/1.0 (Autonomous)"
 
     def break_user_interests(self, state: AgentState) -> None:
         """
@@ -70,7 +74,7 @@ class Designer:
             for sub_topic in sub_topics:
                 search_query = f"Online resources on medium.com for {sub_topic}"
                 resources = self.search_web(search_query, max_results = 2)
-                resource_urls = [resource["url"] for resource in resources]
+                resource_urls = [self.decode_url(url) for url in resources]
 
                 subtopic_metadata.append({
                     "sub_topic": sub_topic,
@@ -130,16 +134,39 @@ class Designer:
 
         state["roadmap"] = response
 
-    def search_web(self, search_query : str, max_results: int) -> list[dict]:
+    def search_web(self, search_query : str, max_results: int) -> list[str]:
         """
-        Use the Tavily Search API to search for resources on Web for a given search query
-        Params:
-            search_query: str
-        Returns:
-            list[dict] - contains url and content info from url
+        Perform a scoped DuckDuckGo search and return a list of URLs corresponding to the search query.
         """
-        search_tool = TavilySearchResults(max_results = max_results)
-        results = search_tool.run(search_query)
-        print(f"Found {len(results)} from the web for the given search query: {search_query}")
+        ddg_url = f"https://html.duckduckgo.com/html/?q={search_query.replace(' ', '+')}"
+        links = []
 
-        return results
+        try:
+            with httpx.Client() as client:
+                resp = client.get(ddg_url, headers={"User-Agent": self.user_agent})
+                if resp.status_code != 200:
+                    return ["<error>Failed to perform search.</error>"]
+        except httpx.RequestError as e:
+            return [f"<error>{e}</error>"]
+
+        soup = BeautifulSoup(resp.text, "html.parser")
+        for a in soup.find_all("a", class_="result__a", href=True):
+            href = a["href"]
+            if "http" in href:
+                links.append(href)
+            if len(links) >= max_results:
+                break
+        
+        print(f"Fetched resources from the web for search_query: {search_query}")
+
+        return links or ["<error>No results found.</error>"]
+    
+    def decode_url(self, url: str) -> str:
+        """
+        Take a URL-encoded duckduckgo url and return the decoded version
+        """
+        # Extract uddg parameter and decode
+        parsed = urlparse(url)
+        params = parse_qs(parsed.query)
+        real_url = unquote(params.get("uddg", [""])[0])
+        return real_url

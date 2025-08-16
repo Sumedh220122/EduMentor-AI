@@ -1,5 +1,5 @@
 langchain-community
-langchain-cohere>=0.1.0,<0.2.0
+langchain-cohere
 python-dotenv
 langgraph
 bs4
