@@ -8,7 +8,7 @@
 
 **Tech Stack Used**
 :This is a python project. EduMentor is a *Multi-Agentic* assistant that has been built with the help of Langgraph and Langchain
-frameworks in python. *Cohere* is used as the llm across all agents. *Tavily* is used for searching resources on web and *Rapid-API* is used for scraping resources fetched from the web.
+frameworks in python. *Cohere* is used as the llm across all agents. *DuckDuckGo* is used for searching resources on web and *Rapid-API* is used for scraping resources fetched from the web.
 
 **Steps to run this file**
 
@@ -28,7 +28,6 @@ frameworks in python. *Cohere* is used as the llm across all agents. *Tavily* is
 4. Create a .env file in the root and set up the following env variables</br>
    ```
    COHERE_API_KEY=
-   TAVILY_API_KEY=
    RAPIAPI_KEY=
    ```
 5. Run the main file:</br>
