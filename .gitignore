@@ -208,3 +208,7 @@ __marimo__/
 
 #Json files
 .json
+
+#Excel files
+.xlsx
+.csv
