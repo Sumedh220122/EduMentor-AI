@@ -210,5 +210,5 @@ __marimo__/
 .json
 
 #Excel files
-.xlsx
+*.xlsx
 .csv
