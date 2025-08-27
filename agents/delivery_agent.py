@@ -84,6 +84,7 @@ class DeliveryAgent:
                 cleaned_content = self.extract_and_cleanup(page_data)
 
                 extracted_resource_data.append({
+                    "week" : roadmap.week,
                     "sub_topic": sub_topic,
                     "content": cleaned_content
                 })
