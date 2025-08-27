@@ -1,4 +1,5 @@
 import streamlit as st
+import asyncio
 from main import EduMentor
 
 st.title("🎓 Student Info Form")
@@ -33,7 +34,10 @@ if submit:
             "learning_commitment": commitment,
         }
         edumentor = EduMentor()
-        resources = edumentor.create_lessons(student_info)
+        resources = asyncio.run_coroutine_threadsafe(
+            edumentor.create_lessons(student_info)
+        )
+        st.session_state["student_name"] = name
 
     st.success("✅ Personalized roadmap created!")
     st.title("📘 Learning Roadmap")

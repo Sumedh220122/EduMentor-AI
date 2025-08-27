@@ -6,11 +6,15 @@ from agents.profiler_agent import Profiler
 from agents.designer import Designer
 from agents.delivery_agent import DeliveryAgent
 
+from database.lessons_collection import DatabaseConnection
+
 class EduMentor:
     def __init__(self):
       self.profiler_agent = Profiler()
       self.designer_agent = Designer()
       self.delivery_agent = DeliveryAgent()
+
+      self.db_connection = DatabaseConnection()
 
     def init_graph(self):
       """
@@ -35,8 +39,6 @@ class EduMentor:
 
       output = await graph.ainvoke({"messages": [{"role" : "user", "content" : json.dumps(student_info)}]})
 
-      print(output["messages"][-1].content)
-
       from models import Roadmap
       roadmaps : list[Roadmap] = output["roadmap"].roadmaps
 
@@ -53,6 +55,14 @@ class EduMentor:
       df = pd.DataFrame(data)
       
       return df
+    
+    def get_student_lessons(self, student_name: str):
+      """
+      Get all lessons for a student by his name
+      """
+      student_lessons = self.db_connection.get_lessons(student_name)
+
+      return student_lessons
 
 # Comment out for testing
 # if __name__ == "__main__":

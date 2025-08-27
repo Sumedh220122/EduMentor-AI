@@ -21,3 +21,14 @@ class DatabaseConnection:
             print(f"Error inserting token holders: {e}")
             return False
         return True
+    
+    def get_lessons(self, student_name: str):
+        try:
+            client = MongoClient(self.mongo_uri)
+            db = client[self.db_name]
+            collection = db["lessons"]
+            record = collection.find_one({"name" : student_name})
+            return record
+        except Exception as e:
+            print(f"Error inserting token holders: {e}")
+            return {}
