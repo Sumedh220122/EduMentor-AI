@@ -1,5 +1,5 @@
 from pydantic import BaseModel, Field
-from typing import Annotated
+from typing import Annotated, Dict, List, Any
 from typing_extensions import TypedDict
 from langgraph.graph.message import add_messages
 
@@ -25,3 +25,7 @@ class AgentState(TypedDict):
     details : StudentDetails
     roadmap: StudentRoadMaps
     messages : Annotated[list, add_messages]
+
+class StudentLessons(BaseModel):
+    name: str
+    lessons: List[Dict[str, Any]]

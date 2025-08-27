@@ -8,7 +8,7 @@
 
 **Tech Stack Used**
 :This is a python project. EduMentor is a *Multi-Agentic* assistant that has been built with the help of Langgraph and Langchain
-frameworks in python. *Cohere* is used as the llm across all agents. *DuckDuckGo* is used for searching resources on web and *Rapid-API* is used for scraping resources fetched from the web.
+frameworks in python. *Cohere* is used as the llm across all agents. *DuckDuckGo* is used for searching resources on web and *Crawl4AI* is used for scraping resources fetched from the web.
 
 **Steps to run this file**
 
@@ -25,10 +25,16 @@ frameworks in python. *Cohere* is used as the llm across all agents. *DuckDuckGo
     ```
     pip install -r requirements.txt
     ```
+4. Setup MongoDB
+      - create a database on MongoDB
+      - create a new database
+      - copy the name of the created database and connection string
+
 4. Create a .env file in the root and set up the following env variables</br>
    ```
-   COHERE_API_KEY=
-   RAPIAPI_KEY=
+   COHERE_API_KEY=YOUR_COHERE_API_KEY
+   MONGO_URI=YOUR_MONGO_URI (copied connection string)
+   DB_NAME=YOUR_DB_NAME (copied db name)
    ```
 5. Run the main file:</br>
    ```
@@ -36,8 +42,6 @@ frameworks in python. *Cohere* is used as the llm across all agents. *DuckDuckGo
    ```
 
 You can get your Cohere API key for free at: https://cohere.com/<br>
-You can get your TAVILY API KEY for free at: https://www.tavily.com/<br>
-You can get your Rapid api api key for free at: https://www.rapidapi.com
 
 **Future Enhancements(In progress)**
 1. Make use of text summarizers to summarize and shorten learning material

@@ -4,3 +4,4 @@ python-dotenv
 langgraph
 bs4
 json_repair
+crawl4ai

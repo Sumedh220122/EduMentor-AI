@@ -1,38 +1,63 @@
-import os
-import json
 from bs4 import BeautifulSoup
-import http.client
+from crawl4ai import AsyncWebCrawler, CrawlResult, CacheMode, CrawlerRunConfig
 from dotenv import load_dotenv
-from models import AgentState,StudentRoadMaps, Roadmap
+from models import AgentState, StudentRoadMaps, Roadmap, StudentLessons
 from langchain_core.messages import AIMessage
+
+from database.lessons_collection import DatabaseConnection
 
 load_dotenv()
 
 class DeliveryAgent:
     def __init__(self):
-        self.conn = http.client.HTTPSConnection("the-web-scraping-api.p.rapidapi.com")
-
-        self.api_key = os.getenv("RAPIDAPI_KEY")
+        self.db_connection = DatabaseConnection()
 
     def extract_and_cleanup(self, page_data : str) -> str:
-        """Extracts and cleans up content from scraped page html content.
+        """
+        Extracts and cleans up content from scraped page html content.
         Args:
             page_data : str -> The HTML content of the page.
         Returns:
             str -> Cleaned text content from the page.
         """
+
+        if page_data is None:
+            return "No lessons to display here."
+
         soup = BeautifulSoup(page_data, 'html.parser')
         for script_or_style in soup(['script', 'style']):
             script_or_style.extract()
 
         cleaned_content = soup.get_text(separator = "\n")
-        cleaned_content = "\n".join(
+        cleaned_content = ".".join(
             line.strip() for line in cleaned_content.splitlines() if line.strip()
         )
 
         return cleaned_content
+    
+    async def scrape_content(self, url: str):
+        """
+        Scrapes content from url resources provided by the designer agent using Crawl4AI
+        Args:
+            url: str -> The resource url which is to be scraped
+        Returns:
+            cleaned page content from the url
+        """
+        crawler_config = CrawlerRunConfig(
+            cache_mode=CacheMode.BYPASS,
+            check_robots_txt=True,
+            stream = False
+        )
 
-    def scrape_content(self, state: AgentState) -> dict:
+        async with AsyncWebCrawler() as crawler:
+            result: CrawlResult = await crawler.arun(
+                url = url,
+                config = crawler_config
+            )
+
+        return result.cleaned_html
+
+    async def deliver_resources(self, state: AgentState) -> dict:
         """
         Scrapes content resource urls provided as a part pf the roadmap by the Designer agent.
         Args:
@@ -40,15 +65,10 @@ class DeliveryAgent:
         Returns:
             dict -> Updated state with scraped content messages.
         """
-        headers = {
-            'x-rapidapi-key': self.api_key,
-            'x-rapidapi-host': "the-web-scraping-api.p.rapidapi.com"
-        }
-        
-        conn_string = "/browser?headers=%7B%7D&method=GET&payload=%7B%7D&screenshot=false&fullScreenshot=false&url={url}"
-
         student_roadmap : StudentRoadMaps = state["roadmap"]
         roadmaps : list[Roadmap] = student_roadmap.roadmaps
+
+        lessons = []
 
         topicwise_extracted_data = None
 
@@ -58,15 +78,8 @@ class DeliveryAgent:
             extracted_resource_data = []
             for url in url_resources:
                 print(f"Fetching content from {url}")
-                conn_string_with_url = conn_string.format(url=url)
-                self.conn.request("GET", conn_string_with_url, headers = headers)
                 
-                res = self.conn.getresponse()
-                data = res.read()
-                decoded_data = data.decode("utf-8")
-
-                data_obj = json.loads(decoded_data)
-                page_data = data_obj["data"] if hasattr(data_obj, "data") else ""
+                page_data = await self.scrape_content(url)
 
                 cleaned_content = self.extract_and_cleanup(page_data)
 
@@ -80,8 +93,20 @@ class DeliveryAgent:
                 "sub_topic_data": extracted_resource_data
             }
 
+            lessons.append(topicwise_extracted_data)
+
             response_msg = AIMessage(content = f"{topicwise_extracted_data}")
             state["messages"] = state["messages"] + [response_msg]
+
+
+        student_name = state["details"].name
+
+        student_lessons = StudentLessons(
+            name = student_name,
+            lessons = lessons
+        )
+
+        self.db_connection.add_lessons(student_lessons)
 
         return {
             "messages": state["messages"],
